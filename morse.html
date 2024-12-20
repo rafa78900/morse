@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REG Brand - Morse Code Encryptor/Decryptor</title>
+    <meta name="description" content="Encrypt and decrypt text to Morse code with REG Brand's tool.">
+    <meta property="og:title" content="REG Brand - Morse Code Encryptor/Decryptor">
+    <meta property="og:description" content="Encrypt and decrypt your text messages using Morse code. Try it now at REG Brand.">
+    <meta property="og:type" content="website">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; background-color: #f8f8f8; display: flex; flex-direction: column; min-height: 100vh; padding: 20px; }
+        a { color: inherit; text-decoration: none; }
+
+        header { 
+            background: linear-gradient(90deg, #000, #333); 
+            color: #fff; 
+            padding: 20px; 
+            text-align: center; 
+            position: fixed; 
+            top: 0; 
+            left: 0;
+            z-index: 1000; 
+            width: 100%; 
+            transition: transform 0.3s ease;
+        }
+        header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        header .home-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #fff;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        header .home-button:hover { background-color: #ddd; }
+
+        main { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 100px 20px 20px; max-width: 1200px; margin: 0 auto; }
+        .morse-container { background-color: #fff; margin: 20px 0; padding: 40px; width: 90%; max-width: 1000px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        .morse-container h2 { color: #333; margin-bottom: 20px; text-align: center; }
+
+        .input-output-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .input-output {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        textarea { padding: 10px; margin: 10px 0; width: 100%; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; line-height: 1.5; }
+
+        button { padding: 12px 24px; color: #fff; background-color: #333; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
+        button:hover { background-color: #555; }
+
+        footer { background: linear-gradient(90deg, #333, #000); color: #fff; text-align: center; padding: 20px; font-size: 1rem; }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2rem; }
+            .morse-container { padding: 30px; }
+            .input-output-container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+                <h1>REG - Morse Code Encryptor/Decryptor</h1>
+    </header>
+
+    <main>
+        <div class="morse-container">
+            <h2>Morse Code Encryptor/Decryptor</h2>
+
+            <div class="input-output-container">
+                <!-- Encrypt Section -->
+                <div class="input-output">
+                    <label for="input-text">Enter Text to Encrypt:</label>
+                    <textarea id="input-text" placeholder="Enter text here..."></textarea>
+                    <button onclick="encryptText()">Encrypt to Morse Code</button>
+                </div>
+
+                <!-- Encrypted Morse Code Output -->
+                <div class="input-output">
+                    <label for="output-morse">Encrypted Morse Code:</label>
+                    <textarea id="output-morse" readonly placeholder="Morse code will appear here..."></textarea>
+                </div>
+            </div>
+
+            <div class="input-output-container">
+                <!-- Morse Code Input -->
+                <div class="input-output">
+                    <label for="input-morse">Enter Morse Code to Decrypt:</label>
+                    <textarea id="input-morse" placeholder="Enter Morse code here..."></textarea>
+                    <button onclick="decryptMorse()">Decrypt to Text</button>
+                </div>
+
+                <!-- Decrypted Text Output -->
+                <div class="input-output">
+                    <label for="output-text">Decrypted Text:</label>
+                    <textarea id="output-text" readonly placeholder="Decrypted text will appear here..."></textarea>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+    </footer>
+
+    <script>
+        // Morse code dictionary
+        const morseCode = {
+            "A": ".-", "B": "-...", "C": "-.-.", "D": "-..", "E": ".", "F": "..-.", "G": "--.",
+            "H": "....", "I": "..", "J": ".---", "K": "-.-", "L": ".-..", "M": "--", "N": "-.",
+            "O": "---", "P": ".--.", "Q": "--.-", "R": ".-.", "S": "...", "T": "-", "U": "..-",
+            "V": "...-", "W": ".--", "X": "-..-", "Y": "-.--", "Z": "--..",
+            "1": ".----", "2": "..---", "3": "...--", "4": "....-", "5": ".....", "6": "-....",
+            "7": "--...", "8": "---..", "9": "----.", "0": "-----",
+            ".": ".-.-.-", ",": "--..--", "?": "..--..", "'": ".----.", "!": "-.-.--", "/": "-..-.",
+            "(": "-.--.", ")": "-.--.-", "&": ".-...", ":": "---...", ";": "-.-.-.", "=": "-...-",
+            "+": ".-.-.", "-": "-....-", "_": "..--.-", "$": "...-..-", "@": ".--.-."
+        };
+
+        // Encrypt function
+        function encryptText() {
+            let text = document.getElementById("input-text").value.toUpperCase();
+            let morse = text.split('').map(char => morseCode[char] || ' ').join(' ');
+            document.getElementById("output-morse").value = morse;
+        }
+
+        // Decrypt function
+        function decryptMorse() {
+            let morse = document.getElementById("input-morse").value;
+            let text = morse.split(' ').map(code => {
+                return Object.keys(morseCode).find(key => morseCode[key] === code) || ' ';
+            }).join('');
+            document.getElementById("output-text").value = text;
+        }
+    </script>
+
+</body>
+</html>
